@@ -7,26 +7,19 @@ namespace TestUtils
   public class RequestDataBuilder<T> : IAnonymousDataBuilder<T>
     where T : new()
   {
-    private Dictionary<string, object> data;
+    private Dictionary<string, object> data = new Dictionary<string, object>();
 
-    public RequestDataBuilder()
-    {
-      data = new Dictionary<string, object>();
-    }
+    public RequestDataBuilder() { }
 
     public RequestDataBuilder(T template)
     {
       var props = template.GetType().GetProperties();
-      data = new Dictionary<string, object>();
 
       foreach (var prop in props)
-        data.Add(prop.Name, GetPropValue(template, prop.Name));
+        data.Add(prop.Name, GetPropertyValue(template, prop.Name));
     }
 
-    public Dictionary<string, object> Create()
-    {
-      return data;
-    }
+    public Dictionary<string, object> Create() => data;
 
     public IAnonymousDataBuilder<T> Omit<TKey>(Expression<Func<T, TKey>> keySelector)
     {
@@ -50,21 +43,17 @@ namespace TestUtils
       return this;
     }
 
-    private string GetPropertyName<TKey>(Expression<Func<T, TKey>> keySelector)
-    {
-      return (keySelector.Body as MemberExpression).Member.Name;
-    }
+    private string GetPropertyName<TKey>(Expression<Func<T, TKey>> keySelector) =>
+      (keySelector.Body as MemberExpression).Member.Name;
 
-    public static object GetPropValue(object src, string propName)
-    {
-      return src.GetType().GetProperty(propName).GetValue(src, null);
-    }
+    public static object GetPropertyValue(object src, string propName) =>
+      src.GetType().GetProperty(propName).GetValue(src, null);
+
   }
   public interface IAnonymousDataBuilder<T>
   {
     IAnonymousDataBuilder<T> Set<TKey>(Expression<Func<T, TKey>> keySelector, object value);
     IAnonymousDataBuilder<T> Omit<TKey>(Expression<Func<T, TKey>> keySelector);
-
     Dictionary<string, object> Create();
   }
 }
