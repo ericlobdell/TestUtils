@@ -1,4 +1,5 @@
 ﻿using Ploeh.AutoFixture.Xunit2;
+using System;
 using Xunit;
 
 namespace TestUtils.Tests
@@ -34,6 +35,15 @@ namespace TestUtils.Tests
 
       Assert.Equal(sut["Name"], template.Name);
       Assert.Equal(sut["Age"], template.Age);
+    }
+
+    [Theory, AutoData]
+    public void Template_ctor_throws_if_tmeplate_null(Person template)
+    {
+      template = null;
+      var ex = Assert.Throws<ArgumentException>(() => new RequestDataBuilder<Person>(template));
+
+      Assert.True(ex.Message.ContainsTerms("instance", "null"));
     }
 
     [Theory, AutoData]
